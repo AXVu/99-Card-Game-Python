@@ -86,9 +86,9 @@ def createGauntletWinner(generations,numPlayers,gamesPerGeneration):
             player.losses = 0
         print(f"Generation {run}")
         runCompetition(gamesPerGeneration,players)
-        del players[[player.losses for player in players].index(min([player.losses for player in players]))]
+        del players[[player.losses for player in players].index(max([player.losses for player in players]))]
         
-    winner = players[[player.losses for player in players].index(max([player.losses for player in players]))]
+    winner = players[[player.losses for player in players].index(min([player.losses for player in players]))]
     print(f"Finalists have the priorities:\n {winner.priorities}")
     print(f"Finalists have the default priorities:\n{winner.defaultPriorities}")
     print(f"Finalists have the coefficients:\n {[winner.priorityCoefficients]}")

@@ -25,6 +25,6 @@ def readPlayer():
             readRow.append({card:num for card,num in zip(cardList,row)})
         player.defaultPriorities = readRow[0]
         temp = list(readRow[1].values())
-        player.priorityCoefficients = {card:(num1,num2) for card,num1,num2 in zip(cardList,list(readRow[2].values()),temp)}
+        player.priorityCoefficients = {card:(num1,num2) for card,num2,num1 in zip(cardList,list(readRow[2].values()),temp)}
         player.updatePriorities(0)
     return player
