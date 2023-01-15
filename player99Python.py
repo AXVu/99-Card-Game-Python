@@ -50,3 +50,36 @@ class Player:
 
         return (100,False)
 
+class Person:
+
+    def __init__(self):
+        self.hand = []
+        self.losses = 0
+
+    def takeTurn(self,num):
+        print(self.hand)
+        play = int(input("Pick card to play as an index (0,1,2)"))
+        card = self.hand[play]
+        del self.hand[play]
+        return self.playCard(num,card,True)
+
+    def playCard(self,num,card,active):
+        if card in ['2','3','4','5','6','7']:
+            return (num + int(card),False)
+        elif card in ['j','q','k']:
+            return (num + 10,False)
+        elif card == 'a':
+            return (num + 1,False)
+        elif card == 'oj':
+            return (99,False)
+        elif card == '8':
+            if active:
+                return num,True
+            return (num,False)
+        elif card == '9':
+            return (num,False)
+        elif card == '10':
+            return (num -10,False)
+        else:
+            print("FATAL ERROR: INVALID CARD PLAYED")
+            exit()

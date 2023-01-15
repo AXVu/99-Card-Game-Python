@@ -26,7 +26,7 @@ def dealCard(deck,player):
     player.hand.append(card)
 
 #Run a single game
-def runGame(players,firstplayer):
+def runGame(players,firstplayer,state):
     for player in players:
         player.hand = []
     deck = resetDeck()
@@ -39,6 +39,8 @@ def runGame(players,firstplayer):
     turn = firstplayer
     while gameLost == 0:
         currentNumber,directionChange = players[turn].takeTurn(currentNumber)
+        if state:
+            print(f"The current number is {currentNumber}")
         if currentNumber > 99:
             gameLost = 1
             return turn
@@ -57,7 +59,7 @@ def runGame(players,firstplayer):
 def runCompetition(numSets,players):
     for i in range(numSets):
         for j in range(len(players)):
-            players[runGame(players,j)].losses += 1
+            players[runGame(players,j,False)].losses += 1
     #print([player.losses for player in players])
     #print([player.priorities for player in players])
 
@@ -69,13 +71,15 @@ def createTournamentWinner(rank,numPlayers,gamesPerGeneration):
         
         for column in list(playersRankDict.keys()):
             if len(playersRankDict[column]) == numPlayers:
-                print(f"Game rank: {column}")
+                #print(f"Game rank: {column}")
                 runCompetition(gamesPerGeneration,playersRankDict[column])
                 playersRankDict[column+1].append(playersRankDict[column][[player.losses for player in playersRankDict[column]].index(min([player.losses for player in playersRankDict[column]]))])
                 for player in playersRankDict[column+1]:
                     player.losses = 0
                 playersRankDict[column] = []
     print(f"Winner has priorities:\n{playersRankDict[rank][0].priorities}")
+    print(f"Winner has the default priorities:\n{playersRankDict[rank][0].defaultPriorities}")
+    print(f"Winner has the coefficients:\n {[playersRankDict[rank][0].priorityCoefficients]}")
     return playersRankDict[rank][0]
         
 def createGauntletWinner(generations,numPlayers,gamesPerGeneration):
@@ -84,7 +88,7 @@ def createGauntletWinner(generations,numPlayers,gamesPerGeneration):
         players.append(pp.Player())
         for player in players:
             player.losses = 0
-        print(f"Generation {run}")
+        #print(f"Generation {run}")
         runCompetition(gamesPerGeneration,players)
         del players[[player.losses for player in players].index(max([player.losses for player in players]))]
         
@@ -99,7 +103,7 @@ if __name__ == "__main__":
     numPlayers = int(input("Input # of players: "))
     gamesPerGeneration = int(input("Input # of games per generation: "))
     cycles = int(input("Input number of generations: "))
-    runType = int(input("1 for tournament style, 2 for gauntlet, 3 for specific set: "))
+    runType = int(input("1 for tournament style, 2 for gauntlet, 3 for specific set, 4 to challenge 1, 5 to play against a bot: "))
     mark = time.time()
     if runType == 1:
         winner = createTournamentWinner(cycles,numPlayers,gamesPerGeneration)
@@ -115,7 +119,30 @@ if __name__ == "__main__":
 
     elif runType == 4:
     #Run 1 player against random opponents until they lose
-        pass
+        players =[]
+        players.append(rp.readPlayer())
+        for i in range(numPlayers-1):
+            players.append(pp.Player())
+        dethroned = False
+        while dethroned == False:
+            players[0].losses = 0
+            runCompetition(gamesPerGeneration,players)
+            if [player.losses for player in players].index(min([player.losses for player in players])) != 0:
+                dethroned = True
+                winner = players[[player.losses for player in players].index(min([player.losses for player in players]))]
+            else:
+                for i in range(numPlayers-1):
+                    del players[i+1]
+                for i in range(numPlayers-1):
+                    players.append(pp.Player())
+    elif runType == 5:
+        players = [pp.Person(),rp.readPlayer()]
+        for i in range(gamesPerGeneration):
+            print(f"game {i}")
+            players[runGame(players,i % 2,True)].losses += 1
+        print([player.losses for player in players])
+
+
     end = time.time() - mark
     print(f"Time: {end}")
     rp.writePlayer(winner)
