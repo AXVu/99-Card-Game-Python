@@ -1,5 +1,6 @@
 import csv
 import player99Python as pp
+import advBot99 as ab
 
 def writePlayer(player):
     playerName = input("Input player name: ")
@@ -15,8 +16,10 @@ def writePlayer(player):
 
 def readPlayer():
     playerName = input("Input player name: ")
+    if playerName in ["god","advbot","ab"]:
+        return ab.advBot
     filename = f"{playerName}playerData.csv"
-    player = pp.Player()
+    player = pp.Player(False)
     with open(filename,mode="r") as file:
         reader = csv.reader(file)
         cardList = ['a','2','3','4','5','6','7','8','9','10','j','q','k','oj']
